@@ -1,143 +1,146 @@
 #!/usr/bin/env node
-
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
 const API_BASE = "https://klaud-api.klaud0x.workers.dev";
+const API_KEY = process.env.KLAUD_API_KEY || "";
 
-// --- helpers ---
-
-async function apiCall(path, params = {}) {
-  const url = new URL(path, API_BASE);
-  for (const [k, v] of Object.entries(params)) {
-    if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));
-  }
-  // inject API key from env if available
-  const key = process.env.KLAUD_API_KEY;
-  if (key) url.searchParams.set("key", key);
-
-  const res = await fetch(url.toString(), {
-    headers: { "User-Agent": "klaud-api-mcp/1.0" },
+async function klaudFetch(endpoint, params = {}) {
+  if (API_KEY) params.apiKey = API_KEY;
+  const url = new URL(`${API_BASE}${endpoint}`);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== "") url.searchParams.set(k, String(v));
   });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`API ${res.status}: ${body.slice(0, 200)}`);
-  }
-  return res.json();
+  const res = await fetch(url.toString(), {
+    headers: { "User-Agent": "klaud-api-mcp/1.0" }
+  });
+  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text().catch(() => "")}`);
+  return await res.json();
 }
 
-function json(data) {
+function ok(data) {
   return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
 }
 
-// --- server ---
+function fail(error) {
+  return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
+}
+
+// --- Server ---
 
 const server = new McpServer({
   name: "klaud-api",
   version: "1.0.0",
+  description: "7 data tools for AI agents — HN, PubMed, arXiv, crypto, GitHub, drugs, web extract"
 });
 
-// 1. Hacker News
+// 1. HackerNews
 server.tool(
-  "hn_top_stories",
-  "Get top Hacker News stories filtered by category (ai, crypto, dev, science, security, all)",
+  "search_hackernews",
+  "Get top HackerNews stories by category (ai, crypto, dev, science, security, all)",
   {
-    category: z.enum(["ai", "crypto", "dev", "science", "security", "all"]).default("all")
-      .describe("Topic category to filter stories"),
-    limit: z.number().min(1).max(30).default(10)
-      .describe("Number of stories to return"),
+    category: z.enum(["ai", "crypto", "dev", "science", "security", "all"]).default("all").describe("Topic category"),
+    limit: z.number().min(1).max(30).default(10).describe("Number of stories (1-30)")
   },
-  async ({ category, limit }) => json(await apiCall("/api/hn", { category, limit }))
+  async ({ category, limit }) => {
+    try { return ok(await klaudFetch("/api/hn", { category, limit })); }
+    catch (e) { return fail(e); }
+  }
 );
 
 // 2. PubMed
 server.tool(
-  "pubmed_search",
-  "Search PubMed for biomedical and life science articles",
+  "search_pubmed",
+  "Search PubMed for medical and scientific research papers",
   {
-    q: z.string().describe("Search query (e.g. 'CRISPR cancer therapy')"),
-    limit: z.number().min(1).max(20).default(5)
-      .describe("Number of articles to return"),
+    query: z.string().describe("Search query (e.g. 'TNBC drug repurposing')"),
+    limit: z.number().min(1).max(20).default(5).describe("Number of results (1-20)")
   },
-  async ({ q, limit }) => json(await apiCall("/api/pubmed", { q, limit }))
+  async ({ query, limit }) => {
+    try { return ok(await klaudFetch("/api/pubmed", { query, limit })); }
+    catch (e) { return fail(e); }
+  }
 );
 
 // 3. arXiv
 server.tool(
-  "arxiv_search",
-  "Search arXiv preprints with optional category filter",
+  "search_arxiv",
+  "Search arXiv for scientific preprints and papers",
   {
-    q: z.string().describe("Search query (e.g. 'LLM agents reasoning')"),
-    category: z.string().optional()
-      .describe("arXiv category filter (e.g. cs.AI, q-bio.BM, stat.ML)"),
-    limit: z.number().min(1).max(20).default(5)
-      .describe("Number of papers to return"),
+    query: z.string().describe("Search query (e.g. 'transformer attention mechanism')"),
+    category: z.string().optional().describe("arXiv category (e.g. cs.AI, cs.LG, q-bio.BM)"),
+    limit: z.number().min(1).max(20).default(5).describe("Number of results (1-20)")
   },
-  async ({ q, category, limit }) => json(await apiCall("/api/arxiv", { q, category, limit }))
+  async ({ query, category, limit }) => {
+    try { return ok(await klaudFetch("/api/arxiv", { query, category, limit })); }
+    catch (e) { return fail(e); }
+  }
 );
 
-// 4. Crypto
+// 4. Crypto Prices
 server.tool(
-  "crypto_prices",
-  "Get real-time cryptocurrency prices (CoinGecko with CoinCap fallback)",
+  "get_crypto_prices",
+  "Get real-time cryptocurrency prices (via CoinGecko)",
   {
-    ids: z.string().default("bitcoin,ethereum")
-      .describe("Comma-separated CoinGecko IDs (e.g. bitcoin,ethereum,solana)"),
+    ids: z.string().describe("Comma-separated coin IDs (e.g. 'bitcoin,ethereum,solana')")
   },
-  async ({ ids }) => json(await apiCall("/api/crypto", { ids }))
+  async ({ ids }) => {
+    try { return ok(await klaudFetch("/api/crypto", { ids })); }
+    catch (e) { return fail(e); }
+  }
 );
 
 // 5. GitHub Trending
 server.tool(
-  "github_trending",
-  "Get trending GitHub repositories",
+  "get_github_trending",
+  "Get trending repositories on GitHub",
   {
-    language: z.string().optional()
-      .describe("Filter by programming language (e.g. python, rust, typescript)"),
-    since: z.enum(["daily", "weekly", "monthly"]).default("daily")
-      .describe("Time range for trending"),
+    language: z.string().optional().describe("Filter by language (e.g. python, rust, typescript)"),
+    since: z.enum(["daily", "weekly", "monthly"]).default("weekly").describe("Time range")
   },
-  async ({ language, since }) => json(await apiCall("/api/github", { language, since }))
+  async ({ language, since }) => {
+    try { return ok(await klaudFetch("/api/github", { language, since })); }
+    catch (e) { return fail(e); }
+  }
 );
 
 // 6. Web Extract
 server.tool(
-  "extract_url",
-  "Extract readable text content from any URL (HTML → clean text)",
+  "extract_webpage",
+  "Extract clean text content from any URL",
   {
-    url: z.string().url().describe("URL to extract text from"),
+    url: z.string().url().describe("URL to extract content from")
   },
-  async ({ url }) => json(await apiCall("/api/extract", { url }))
-);
-
-// 7. Drug/Molecule Lookup
-server.tool(
-  "drug_lookup",
-  "Search drugs and molecules via ChEMBL (2.4M compounds). Search by name or by protein target.",
-  {
-    q: z.string().optional()
-      .describe("Drug/molecule name (e.g. imatinib, aspirin)"),
-    target: z.string().optional()
-      .describe("Protein target name (e.g. EGFR, BRCA1, JAK2)"),
-  },
-  async ({ q, target }) => {
-    if (!q && !target) {
-      return { content: [{ type: "text", text: "Provide either q (drug name) or target (protein name)" }] };
-    }
-    return json(await apiCall("/api/drugs", { q, target }));
+  async ({ url }) => {
+    try { return ok(await klaudFetch("/api/extract", { url })); }
+    catch (e) { return fail(e); }
   }
 );
 
-// --- run ---
+// 7. Drug Search (ChEMBL)
+server.tool(
+  "search_drugs",
+  "Search drugs by name or find approved drugs for a target protein (via ChEMBL, 2.4M compounds)",
+  {
+    query: z.string().optional().describe("Drug name (e.g. 'imatinib', 'aspirin')"),
+    target: z.string().optional().describe("Target protein (e.g. 'EGFR', 'BRAF')")
+  },
+  async ({ query, target }) => {
+    try { return ok(await klaudFetch("/api/drugs", { query, target })); }
+    catch (e) { return fail(e); }
+  }
+);
+
+// --- Start ---
 
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("klaud-api-mcp server running on stdio");
+  console.error("Klaud API MCP Server v1.0.0 running on stdio");
 }
 
-main().catch((err) => {
-  console.error("Fatal:", err);
+main().catch(e => {
+  console.error("Fatal:", e);
   process.exit(1);
 });
