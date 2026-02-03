@@ -1,0 +1,31 @@
+{
+  "name": "klaud-api-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Klaud API — HN, PubMed, arXiv, crypto, GitHub trending, drugs/molecules, web extraction",
+  "type": "module",
+  "bin": {
+    "klaud-api-mcp": "./src/index.js"
+  },
+  "files": ["src"],
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "mcp", "mcp-server", "ai-agent", "hacker-news", "pubmed", "arxiv",
+    "crypto", "github-trending", "chembl", "drug-discovery", "web-extraction",
+    "claude", "cursor", "ai-tools", "klaud-api"
+  ],
+  "author": "klaud-0x",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/klaud-0x/klaud-api-mcp"
+  },
+  "homepage": "https://klaud-api.klaud0x.workers.dev",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
