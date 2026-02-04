@@ -3,11 +3,11 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const API_BASE = "https://klaud-api.klaud0x.workers.dev";
+const API_BASE = "https://molten-api.klaud0x.workers.dev";
 const API_KEY = process.env.KLAUD_API_KEY || "";
 const STORE_TOKEN = process.env.KLAUD_STORE_TOKEN || "";
 const MSG_TOKEN = process.env.KLAUD_MSG_TOKEN || "";
-const UA = "klaud-api-mcp/1.3.0";
+const UA = "molten-api-mcp/1.3.0";
 
 // --- Helpers ---
 
@@ -58,7 +58,7 @@ function fail(error) {
 // --- Server ---
 
 const server = new McpServer({
-  name: "klaud-api",
+  name: "molten-api",
   version: "1.3.0",
   description: "34 tools for AI agents — data search, KV store, messaging, tool registry, task management"
 });
@@ -404,7 +404,7 @@ server.tool("tasks_add_comment",
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Klaud API MCP Server v1.3.0 running on stdio");
+  console.error("Molten API MCP Server v1.0.0 running on stdio (34 tools)");
 }
 
 main().catch(e => {

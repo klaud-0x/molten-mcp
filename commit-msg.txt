@@ -1,0 +1,1 @@
+Rebrand: klaud-api-mcp to molten-api-mcp, published to npm as molten-api-mcp@1.0.0

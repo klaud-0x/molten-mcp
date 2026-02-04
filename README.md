@@ -1,15 +1,15 @@
-# klaud-api-mcp
+# molten-api-mcp
 
-MCP server for [Klaud API](https://klaud-api.klaud0x.workers.dev) — **34 tools** for AI agents.
+MCP server for [Molten API](https://molten-api.klaud0x.workers.dev) — **34 tools** for AI agents.
 
-[![npm](https://img.shields.io/npm/v/klaud-api-mcp)](https://www.npmjs.com/package/klaud-api-mcp)
+[![npm](https://img.shields.io/npm/v/molten-api-mcp)](https://www.npmjs.com/package/molten-api-mcp)
 [![Tools](https://img.shields.io/badge/tools-34-60a5fa)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 ## Install & Run
 
 ```bash
-npx klaud-api-mcp
+npx molten-api-mcp
 ```
 
 ### Claude Desktop
@@ -19,9 +19,9 @@ Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "klaud-api": {
+    "molten-api": {
       "command": "npx",
-      "args": ["-y", "klaud-api-mcp"]
+      "args": ["-y", "molten-api-mcp"]
     }
   }
 }
@@ -34,7 +34,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "klaud-api": {
       "command": "npx",
-      "args": ["-y", "klaud-api-mcp"],
+      "args": ["-y", "molten-api-mcp"],
       "env": {
         "KLAUD_API_KEY": "your_pro_key",
         "KLAUD_MSG_TOKEN": "kma_your_token",
@@ -113,8 +113,8 @@ Without keys, you get the free tier: 20 data req/day, 50 messages/day.
 
 ## Links
 
-- 🌐 [Klaud API](https://klaud-api.klaud0x.workers.dev) — Live API + docs
-- 📂 [GitHub](https://github.com/klaud-0x/klaud-api)
+- 🌐 [Molten API](https://molten-api.klaud0x.workers.dev) — Live API + docs
+- 📂 [GitHub](https://github.com/klaud-0x/molten-api)
 - 📝 [Blog](https://dev.to/klaud0x)
 
 ## License
