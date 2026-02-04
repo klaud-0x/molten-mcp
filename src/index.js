@@ -3,15 +3,15 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const API_BASE = "https://molten-api.klaud0x.workers.dev";
-const API_KEY = process.env.KLAUD_API_KEY || "";
-const STORE_TOKEN = process.env.KLAUD_STORE_TOKEN || "";
-const MSG_TOKEN = process.env.KLAUD_MSG_TOKEN || "";
-const UA = "molten-api-mcp/1.3.0";
+const API_BASE = "https://molten.klaud0x.workers.dev";
+const API_KEY = process.env.MOLTEN_API_KEY || "";
+const STORE_TOKEN = process.env.MOLTEN_STORE_TOKEN || "";
+const MSG_TOKEN = process.env.MOLTEN_MSG_TOKEN || "";
+const UA = "molten-mcp/2.0.0";
 
 // --- Helpers ---
 
-async function klaudFetch(endpoint, params = {}) {
+async function moltenFetch(endpoint, params = {}) {
   if (API_KEY) params.apiKey = API_KEY;
   const url = new URL(`${API_BASE}${endpoint}`);
   Object.entries(params).forEach(([k, v]) => {
@@ -58,7 +58,7 @@ function fail(error) {
 // --- Server ---
 
 const server = new McpServer({
-  name: "molten-api",
+  name: "molten-mcp",
   version: "1.3.0",
   description: "34 tools for AI agents — data search, KV store, messaging, tool registry, task management"
 });
@@ -68,67 +68,67 @@ const server = new McpServer({
 server.tool("search_hackernews",
   "Get top HackerNews stories by category (ai, crypto, dev, science, security, all)",
   { category: z.enum(["ai","crypto","dev","science","security","all"]).default("all"), limit: z.number().min(1).max(30).default(10) },
-  async ({ category, limit }) => { try { return ok(await klaudFetch("/api/hn", { category, limit })); } catch(e) { return fail(e); } }
+  async ({ category, limit }) => { try { return ok(await moltenFetch("/api/hn", { category, limit })); } catch(e) { return fail(e); } }
 );
 
 server.tool("search_pubmed",
   "Search PubMed for medical/scientific papers",
   { query: z.string().describe("Search query"), limit: z.number().min(1).max(20).default(5) },
-  async ({ query, limit }) => { try { return ok(await klaudFetch("/api/pubmed", { query, limit })); } catch(e) { return fail(e); } }
+  async ({ query, limit }) => { try { return ok(await moltenFetch("/api/pubmed", { query, limit })); } catch(e) { return fail(e); } }
 );
 
 server.tool("search_arxiv",
   "Search arXiv for scientific preprints",
   { query: z.string(), category: z.string().optional().describe("e.g. cs.AI, cs.LG"), limit: z.number().min(1).max(20).default(5) },
-  async ({ query, category, limit }) => { try { return ok(await klaudFetch("/api/arxiv", { query, category, limit })); } catch(e) { return fail(e); } }
+  async ({ query, category, limit }) => { try { return ok(await moltenFetch("/api/arxiv", { query, category, limit })); } catch(e) { return fail(e); } }
 );
 
 server.tool("get_crypto_prices",
   "Get real-time cryptocurrency prices (CoinGecko)",
   { ids: z.string().describe("Comma-separated coin IDs: bitcoin,ethereum,solana") },
-  async ({ ids }) => { try { return ok(await klaudFetch("/api/crypto", { ids })); } catch(e) { return fail(e); } }
+  async ({ ids }) => { try { return ok(await moltenFetch("/api/crypto", { ids })); } catch(e) { return fail(e); } }
 );
 
 server.tool("get_github_trending",
   "Get trending GitHub repos",
   { language: z.string().optional(), since: z.enum(["daily","weekly","monthly"]).default("weekly") },
-  async ({ language, since }) => { try { return ok(await klaudFetch("/api/github", { language, since })); } catch(e) { return fail(e); } }
+  async ({ language, since }) => { try { return ok(await moltenFetch("/api/github", { language, since })); } catch(e) { return fail(e); } }
 );
 
 server.tool("extract_webpage",
   "Extract clean text from any URL",
   { url: z.string().url() },
-  async ({ url }) => { try { return ok(await klaudFetch("/api/extract", { url })); } catch(e) { return fail(e); } }
+  async ({ url }) => { try { return ok(await moltenFetch("/api/extract", { url })); } catch(e) { return fail(e); } }
 );
 
 server.tool("search_drugs",
   "Search drugs/molecules via ChEMBL (2.4M compounds). Query by name or target protein.",
   { query: z.string().optional().describe("Drug name: imatinib, aspirin"), target: z.string().optional().describe("Target protein: EGFR, BRAF") },
-  async ({ query, target }) => { try { return ok(await klaudFetch("/api/drugs", { query, target })); } catch(e) { return fail(e); } }
+  async ({ query, target }) => { try { return ok(await moltenFetch("/api/drugs", { query, target })); } catch(e) { return fail(e); } }
 );
 
 server.tool("get_weather",
   "Current weather + 3-day forecast",
   { city: z.string().optional(), lat: z.string().optional(), lon: z.string().optional() },
-  async ({ city, lat, lon }) => { try { return ok(await klaudFetch("/api/weather", { city, lat, lon })); } catch(e) { return fail(e); } }
+  async ({ city, lat, lon }) => { try { return ok(await moltenFetch("/api/weather", { city, lat, lon })); } catch(e) { return fail(e); } }
 );
 
 server.tool("search_wikipedia",
   "Search Wikipedia articles",
   { query: z.string(), lang: z.string().default("en"), limit: z.number().min(1).max(10).default(3) },
-  async ({ query, lang, limit }) => { try { return ok(await klaudFetch("/api/wiki", { q: query, lang, limit })); } catch(e) { return fail(e); } }
+  async ({ query, lang, limit }) => { try { return ok(await moltenFetch("/api/wiki", { q: query, lang, limit })); } catch(e) { return fail(e); } }
 );
 
 server.tool("search_news",
   "Search recent news via Google News",
   { query: z.string(), limit: z.number().min(1).max(20).default(10), lang: z.string().default("en") },
-  async ({ query, limit, lang }) => { try { return ok(await klaudFetch("/api/news", { q: query, limit, lang })); } catch(e) { return fail(e); } }
+  async ({ query, limit, lang }) => { try { return ok(await moltenFetch("/api/news", { q: query, limit, lang })); } catch(e) { return fail(e); } }
 );
 
 server.tool("search_reddit",
   "Browse subreddits or search Reddit",
   { subreddit: z.string().optional(), query: z.string().optional(), sort: z.enum(["hot","new","top","relevance"]).default("hot"), limit: z.number().min(1).max(25).default(10) },
-  async ({ subreddit, query, sort, limit }) => { try { return ok(await klaudFetch("/api/reddit", { sub: subreddit, q: query, sort, limit })); } catch(e) { return fail(e); } }
+  async ({ subreddit, query, sort, limit }) => { try { return ok(await moltenFetch("/api/reddit", { sub: subreddit, q: query, sort, limit })); } catch(e) { return fail(e); } }
 );
 
 // ============ STORE (12-15) ============
@@ -141,7 +141,7 @@ server.tool("store_create",
 
 server.tool("store_get",
   "Read a value from KV store by key",
-  { key: z.string(), token: z.string().optional().describe("Store token (or set KLAUD_STORE_TOKEN env)") },
+  { key: z.string(), token: z.string().optional().describe("Store token (or set MOLTEN_STORE_TOKEN env)") },
   async ({ key, token }) => { try { return ok(await storeFn(`/${encodeURIComponent(key)}`, 'GET', null, token)); } catch(e) { return fail(e); } }
 );
 
@@ -168,7 +168,7 @@ server.tool("store_list",
 // ============ MESSAGING (16-24) ============
 
 server.tool("msg_register",
-  "Register a new agent on Klaud Messaging. Returns agent_id + kma_ token. Use this token for all messaging, registry, and tasks operations.",
+  "Register a new agent on Molten Messaging. Returns agent_id + kma_ token. Use this token for all messaging, registry, and tasks operations.",
   { name: z.string().min(3).max(32).describe("Unique agent name [a-zA-Z0-9_-]"), description: z.string().max(256).optional(), tags: z.array(z.string()).max(10).optional() },
   async ({ name, description, tags }) => {
     try {

@@ -1,10 +1,10 @@
 {
-  "name": "molten-api-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for Molten API — 34 tools for AI agents: data search, KV store, agent messaging, tool registry, task management",
+  "name": "molten-mcp",
+  "version": "2.0.0",
+  "description": "MCP server for Molten — 34 tools for AI agents: data search, KV store, agent messaging, tool registry, task management",
   "type": "module",
   "bin": {
-    "molten-api-mcp": "./bin/molten-api-mcp.js"
+    "molten-mcp": "./bin/molten-mcp.js"
   },
   "main": "./src/index.js",
   "files": [
@@ -20,6 +20,7 @@
     "ai",
     "agent",
     "api",
+    "molten",
     "hackernews",
     "pubmed",
     "arxiv",
@@ -28,13 +29,10 @@
     "drugs",
     "store",
     "kv",
-    "ephemeral",
     "weather",
     "news",
     "reddit",
     "wikipedia",
-    "molten",
-    "klaud",
     "messaging",
     "registry",
     "tasks",
@@ -45,7 +43,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/klaud-0x/molten-api.git"
+    "url": "git+https://github.com/klaud-0x/molten-mcp.git"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

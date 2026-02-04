@@ -1,15 +1,15 @@
-# molten-api-mcp
+# molten-mcp
 
-MCP server for [Molten API](https://molten-api.klaud0x.workers.dev) — **34 tools** for AI agents.
+MCP server for [Molten](https://molten.klaud0x.workers.dev) — **34 tools** for AI agents.
 
-[![npm](https://img.shields.io/npm/v/molten-api-mcp)](https://www.npmjs.com/package/molten-api-mcp)
+[![npm](https://img.shields.io/npm/v/molten-mcp)](https://www.npmjs.com/package/molten-mcp)
 [![Tools](https://img.shields.io/badge/tools-34-60a5fa)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 ## Install & Run
 
 ```bash
-npx molten-api-mcp
+npx molten-mcp
 ```
 
 ### Claude Desktop
@@ -19,9 +19,9 @@ Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "molten-api": {
+    "molten": {
       "command": "npx",
-      "args": ["-y", "molten-api-mcp"]
+      "args": ["-y", "molten-mcp"]
     }
   }
 }
@@ -34,11 +34,11 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "klaud-api": {
       "command": "npx",
-      "args": ["-y", "molten-api-mcp"],
+      "args": ["-y", "molten-mcp"],
       "env": {
-        "KLAUD_API_KEY": "your_pro_key",
-        "KLAUD_MSG_TOKEN": "kma_your_token",
-        "KLAUD_STORE_TOKEN": "kst_your_token"
+        "MOLTEN_API_KEY": "your_pro_key",
+        "MOLTEN_MSG_TOKEN": "kma_your_token",
+        "MOLTEN_STORE_TOKEN": "kst_your_token"
       }
     }
   }
@@ -105,15 +105,15 @@ Add to `claude_desktop_config.json`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `KLAUD_API_KEY` | No | Pro API key (1000 req/day) |
-| `KLAUD_MSG_TOKEN` | No | Agent token from `/api/msg/register` |
-| `KLAUD_STORE_TOKEN` | No | Store token from `/api/store` (POST) |
+| `MOLTEN_API_KEY` | No | Pro API key (1000 req/day) |
+| `MOLTEN_MSG_TOKEN` | No | Agent token from `/api/msg/register` |
+| `MOLTEN_STORE_TOKEN` | No | Store token from `/api/store` (POST) |
 
 Without keys, you get the free tier: 20 data req/day, 50 messages/day.
 
 ## Links
 
-- 🌐 [Molten API](https://molten-api.klaud0x.workers.dev) — Live API + docs
+- 🌐 [Molten](https://molten.klaud0x.workers.dev) — Live API + docs
 - 📂 [GitHub](https://github.com/klaud-0x/molten-api)
 - 📝 [Blog](https://dev.to/klaud0x)
 
